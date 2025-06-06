@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MariaDbConfig {
+
 	@Bean
 	DataSource dataSource() {
 		MariaDbPoolDataSource dataSource = new MariaDbPoolDataSource();
