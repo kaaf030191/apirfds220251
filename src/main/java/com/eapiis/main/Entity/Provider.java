@@ -1,6 +1,6 @@
 package com.eapiis.main.Entity;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,8 +22,8 @@ public class Provider {
 	private String name;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private Timestamp createdAt;
 
 	@Column(name = "updatedAt")
-	private Date updatedAt;
+	private Timestamp updatedAt;
 }
