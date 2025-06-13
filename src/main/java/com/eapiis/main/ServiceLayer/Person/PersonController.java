@@ -5,8 +5,10 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +51,17 @@ public class PersonController {
 		PersonGetAllResponse response = new PersonGetAllResponse();
 
 		response.dto.listPerson = entityManager.createQuery("select p from Person p", Person.class).getResultList();
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@Transactional
+	@DeleteMapping(path = "/delete/{idPerson}")
+	public ResponseEntity<PersonDeleteResponse> actionDelete(@PathVariable String idPerson) {
+		PersonDeleteResponse response = new PersonDeleteResponse();
+
+		entityManager.createQuery("delete from Person p where p.idPerson = :idPerson")
+			.setParameter("idPerson", idPerson).executeUpdate();
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
