@@ -11,7 +11,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PersonInsertRequest {
+public class PersonUpdateRequest {
+	private String idPerson;
 	private String firstName;
 	private String surName;
 	private String dni;

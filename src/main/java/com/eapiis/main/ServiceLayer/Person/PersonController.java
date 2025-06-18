@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eapiis.main.Entity.Person;
+import com.eapiis.main.Entity.Phone;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -37,11 +38,65 @@ public class PersonController {
 		person.setSurName(request.getSurName());
 		person.setDni(request.getDni());
 		person.setGender(request.isGender());
-		person.setBirthDate(new java.sql.Date(new Date().getTime()));
+		person.setBirthDate(new java.sql.Date(request.getBirthDate().getTime()));
 		person.setCreatedAt(new java.sql.Timestamp(new Date().getTime()));
 		person.setUpdatedAt(person.getCreatedAt());
 
 		entityManager.persist(person);
+
+		for(PersonInsertRequest.Phone item: request.getListPhone()) {
+			Phone phone = new Phone();
+
+			phone.setIdPhone(UUID.randomUUID().toString());
+			phone.setIdPerson(person.getIdPerson());
+			phone.setIdProvider(item.getIdProvider());
+			phone.setNumber(item.getNumber());
+			phone.setCreatedAt(new java.sql.Timestamp(new Date().getTime()));
+			phone.setUpdatedAt(phone.getCreatedAt());
+
+			entityManager.persist(phone);
+		}
+
+		response.type = "success";
+		response.listMessage.add("Operación realizada correctamente.");
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@Transactional
+	@PostMapping(path = "/update", consumes = "multipart/form-data")
+	public ResponseEntity<PersonUpdateResponse> actionUpdate(@ModelAttribute PersonUpdateRequest request) {
+		PersonUpdateResponse response = new PersonUpdateResponse();
+
+		Person person = entityManager.find(Person.class, request.getIdPerson());
+
+		person.setFirstName(request.getFirstName());
+		person.setSurName(request.getSurName());
+		person.setDni(request.getDni());
+		person.setGender(request.isGender());
+		person.setBirthDate(new java.sql.Date(request.getBirthDate().getTime()));
+		person.setUpdatedAt(new java.sql.Timestamp(new Date().getTime()));
+
+		entityManager.merge(person);
+
+		entityManager.createQuery("delete from Phone p where p.idPerson = :idPerson")
+			.setParameter("idPerson", request.getIdPerson()).executeUpdate();
+
+		for(PersonUpdateRequest.Phone item: request.getListPhone()) {
+			Phone phone = new Phone();
+
+			phone.setIdPhone(UUID.randomUUID().toString());
+			phone.setIdPerson(person.getIdPerson());
+			phone.setIdProvider(item.getIdProvider());
+			phone.setNumber(item.getNumber());
+			phone.setCreatedAt(new java.sql.Timestamp(new Date().getTime()));
+			phone.setUpdatedAt(phone.getCreatedAt());
+
+			entityManager.persist(phone);
+		}
+
+		response.type = "success";
+		response.listMessage.add("Operación realizada correctamente.");
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -50,7 +105,7 @@ public class PersonController {
 	public ResponseEntity<PersonGetAllResponse> actionGetAll() {
 		PersonGetAllResponse response = new PersonGetAllResponse();
 
-		response.dto.listPerson = entityManager.createQuery("select p from Person p", Person.class).getResultList();
+		response.dto.listPerson = entityManager.createQuery("select p from Person p left join fetch p.listPhone lp left join fetch lp.provider", Person.class).getResultList();
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -62,6 +117,9 @@ public class PersonController {
 
 		entityManager.createQuery("delete from Person p where p.idPerson = :idPerson")
 			.setParameter("idPerson", idPerson).executeUpdate();
+
+		response.type = "success";
+		response.listMessage.add("Operación realizada correctamente.");
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

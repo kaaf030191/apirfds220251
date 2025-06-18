@@ -2,10 +2,15 @@ package com.eapiis.main.Entity;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -35,6 +40,10 @@ public class Person {
 
 	@Column(name = "updatedAt")
 	private Timestamp updatedAt;
+
+	@JsonManagedReference
+	@OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+	private List<Phone> listPhone;
 
 	public String getIdPerson() {
 		return this.idPerson;
@@ -100,4 +109,11 @@ public class Person {
 		this.updatedAt = updatedAt;
 	}
 
+	public List<Phone> getListPhone() {
+		return this.listPhone;
+	}
+
+	public void setListPhone(List<Phone> listPhone) {
+		this.listPhone = listPhone;
+	}
 }
