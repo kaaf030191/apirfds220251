@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,6 +20,7 @@ import com.eapiis.main.Entity.Phone;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/person")
@@ -28,8 +30,16 @@ public class PersonController {
 
 	@Transactional
 	@PostMapping(path = "/insert", consumes = "multipart/form-data")
-	public ResponseEntity<PersonInsertResponse> actionInsert(@ModelAttribute PersonInsertRequest request) {
+	public ResponseEntity<PersonInsertResponse> actionInsert(@Valid @ModelAttribute PersonInsertRequest request, BindingResult bindingResult) {
 		PersonInsertResponse response = new PersonInsertResponse();
+
+		if (bindingResult.hasErrors()) {
+			bindingResult.getAllErrors().forEach(error -> {
+				response.listMessage.add(error.getDefaultMessage());
+			});
+
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
 
 		Person person = new Person();
 

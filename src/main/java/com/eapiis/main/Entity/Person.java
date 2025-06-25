@@ -77,7 +77,7 @@ public class Person {
 		this.dni = dni;
 	}
 
-	public boolean getGender() {
+	public boolean isGender() {
 		return this.gender;
 	}
 
