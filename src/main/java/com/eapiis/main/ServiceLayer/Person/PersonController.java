@@ -38,6 +38,8 @@ public class PersonController {
 				response.listMessage.add(error.getDefaultMessage());
 			});
 
+			response.type = "error";
+
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 
